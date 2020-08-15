@@ -1,38 +1,67 @@
+// Dependencies
 const mysql = require("mysql");
 const inquirer = require("inquirer");
 const connection = mysql.createConnection({
     host: "localhost",
-    // Your port; if not 3306
+    // port
     port: 3306,
-    // Your username
+    // username
     user: "root",
-    // Your password
+    // password
     password: "Nicky0416!",
+    // database
     database: "exercises"
 });
 
-//add exercises
+// launch main menu on startup
 connection.connect(function (err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId);
     mainMenu();
 });
 
-// main menu
-function mainMenu() {
-    inquirer
-        .prompt({
+// main menu function
+const mainMenu = function () {
+    inquirer.prompt({
+            name: "menuOpt",
+            type: "list",
+            message: "Welcome!",
+            choices: ["GENERATE A WORKOUT", "GO TO EXERCISE DATABASE", "EXIT"]
+        })
+        .then(function (answer) {
+            if (answer.menuOpt === "GENERATE A WORKOUT") {
+                wGen();
+            }
+            else if (answer.menuOpt === "GO TO EXERCISE DATABASE") {
+                exerDB();
+            } 
+            else {
+                connection.end();
+            }
+        });
+}
+
+// exercise database manager menu
+const exerDB = function () {
+    inquirer.prompt([{
             name: "menuOpt",
             type: "list",
             message: "Would you like to ADD or VIEW exercises?",
             choices: ["ADD", "VIEW", "EXIT"]
-        })
+        },
+        {
+            name: "group",
+            type: "list",
+            message: "Which Group?",
+            choices: ["UPPER", "LOWER"]
+        }])
         .then(function (answer) {
             // based on their answer, either call the bid or the post functions
             if (answer.menuOpt === "ADD") {
                 addExer();
             }
             else if (answer.menuOpt === "VIEW") {
+                // parametize this query
                 connection.query("SELECT * FROM upper", (err, results) => {
                     if (err) throw error;
                     results.forEach(row => {
@@ -49,34 +78,7 @@ function mainMenu() {
 
 // add exercise function
 const addExer = function () {
-    inquirer.prompt([
-        {
-            type: "input",
-            message: "Exercise Name?",
-            name: "exercise",
-        },
-        {
-            type: "input",
-            message: "Main?",
-            name: "main",
-        },
-        {
-            type: "input",
-            message: "Aux 1?",
-            name: "aux1",
-        },
-        {
-            type: "input",
-            message: "Aux 2?",
-            name: "aux2",
-        },
-        {
-            type: "confirm",
-            message: "Add another Exercise?",
-            name: "another",
-        }
-
-    ])
+    inquirer.prompt(exerQ)
         .then(function (response) {
             var query = connection.query(
                 "INSERT INTO upper SET ?",
@@ -100,3 +102,32 @@ const addExer = function () {
             );
         })
 }
+
+// questions array, make code look cleaner
+const exerQ = [
+    {
+        type: "input",
+        message: "Exercise Name?",
+        name: "exercise",
+    },
+    {
+        type: "input",
+        message: "Main?",
+        name: "main",
+    },
+    {
+        type: "input",
+        message: "Aux 1?",
+        name: "aux1",
+    },
+    {
+        type: "input",
+        message: "Aux 2?",
+        name: "aux2",
+    },
+    {
+        type: "confirm",
+        message: "Add another Exercise?",
+        name: "another",
+    }
+]
