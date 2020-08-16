@@ -1,16 +1,15 @@
 // Dependencies
 const mysql = require("mysql");
 const inquirer = require("inquirer");
+const parts = require("./var")
+const equip = require("./var")
+const exerQ = require("./var")
 const connection = mysql.createConnection({
     host: "localhost",
-    // port
     port: 3306,
-    // username
     user: "root",
-    // password
     password: "Nicky0416!",
-    // database
-    database: "exercises"
+    database: "exerdb"
 });
 
 // launch main menu on startup
@@ -21,113 +20,84 @@ connection.connect(function (err) {
 });
 
 // main menu function
-const mainMenu = function () {
-    inquirer.prompt({
+const mainMenu = () => {
+    return inquirer.prompt([
+        {
             name: "menuOpt",
             type: "list",
             message: "Welcome!",
-            choices: ["GENERATE A WORKOUT", "GO TO EXERCISE DATABASE", "EXIT"]
-        })
-        .then(function (answer) {
-            if (answer.menuOpt === "GENERATE A WORKOUT") {
-                wGen();
-            }
-            else if (answer.menuOpt === "GO TO EXERCISE DATABASE") {
-                exerDB();
-            } 
-            else {
-                connection.end();
-            }
-        });
-}
-
-// exercise database manager menu
-const exerDB = function () {
-    inquirer.prompt([{
-            name: "menuOpt",
-            type: "list",
-            message: "Would you like to ADD or VIEW exercises?",
-            choices: ["ADD", "VIEW", "EXIT"]
-        },
-        {
-            name: "group",
-            type: "list",
-            message: "Which Group?",
-            choices: ["UPPER", "LOWER"]
-        }])
-        .then(function (answer) {
-            // based on their answer, either call the bid or the post functions
-            if (answer.menuOpt === "ADD") {
-                addExer();
-            }
-            else if (answer.menuOpt === "VIEW") {
-                // parametize this query
-                connection.query("SELECT * FROM upper", (err, results) => {
-                    if (err) throw error;
-                    results.forEach(row => {
-                        console.log(`${row.exerID} / ${row.exercise} / ${row.main} / ${row.aux1} / ${row.aux2}`);
-                    });
+            choices: ["GENERATE A WORKOUT", "VIEW EXERCISE DATABASE", "ADD TO EXERCISE DATABASE", "EDIT EXERCISE DATABASE", "EXIT"]
+        }
+    ])
+        .then(response => {
+            //switch case, because smoother than if/else
+            switch (response.menuOpt) {
+                case "GENERATE A WORKOUT":
+                    return wGen();
+                case "VIEW EXERCISE DATABASE":
+                    return exerDB();
+                case "ADD TO EXERCISE DATABASE":
+                    return addExerQ();
+                case "EDIT EXERCISE DATABASE":
+                    return editExer();
+                default:
                     connection.end();
-                })
-            } 
-            else {
-                connection.end();
             }
         });
 }
 
-// add exercise function
-const addExer = function () {
-    inquirer.prompt(exerQ)
-        .then(function (response) {
-            var query = connection.query(
-                "INSERT INTO upper SET ?",
-                {
-                    exercise: response.exercise,
-                    main: response.main,
-                    aux1: response.aux1,
-                    aux2: response.aux2
-                },
-                function (err, res) {
-                    if (response.another) {
-                        addExer();
-                    }
-                    if (err) throw err;
-                    else {
-                        console.log(res.affectedRows + " exercise inserted!\n")
-                        console.log(query.sql);
-                    }
-                }
-
-            );
-        })
+function wGen() {
+    console.log("GENERATE A WORKOUT")
+    connection.end();
 }
 
-// questions array, make code look cleaner
-const exerQ = [
-    {
-        type: "input",
-        message: "Exercise Name?",
-        name: "exercise",
-    },
-    {
-        type: "input",
-        message: "Main?",
-        name: "main",
-    },
-    {
-        type: "input",
-        message: "Aux 1?",
-        name: "aux1",
-    },
-    {
-        type: "input",
-        message: "Aux 2?",
-        name: "aux2",
-    },
-    {
-        type: "confirm",
-        message: "Add another Exercise?",
-        name: "another",
-    }
-]
+//View the exercise database and print it to the console
+function exerDB() {
+    connection.query("SELECT * FROM exercises", (err, results) => {
+        if (err) throw error;
+        results.forEach(row => {
+            console.log(`${row.exerID} / ${row.exercise} / ${row.main} / ${row.aux1} / ${row.aux2} / ${row.mgroup} / ${row.UorL} / ${row.equip}`);
+        });
+        connection.end();
+    })
+}
+
+// uses choices from a list and dataRecord variable to greatly shorten the code
+const addExer = dataRecord => {
+    connection.query("INSERT INTO exercises SET ?", dataRecord, (err, results) => {
+        if (err) throw err;
+        mainMenu();
+    })
+}
+// ask the create auction questions
+const addExerQ = () => {
+    return inquirer.prompt(exerQ)
+        .then(response => {
+            addExer(response)
+        });
+}
+
+//function to remove exercises from the database
+const editExer = () => {
+//selects the exercises and prints to console as a list of choices in an Inquirer checkbox   
+    connection.query("SELECT * FROM exercises", (err, results) => {
+        if(err) throw err;
+        let choices = results.map( row => { 
+            return {
+                name: `${row.exerID} / ${row.exercise} / ${row.main} / ${row.aux1} / ${row.aux2} / ${row.mgroup} / ${row.UorL} / ${row.equip}`,
+                value: row
+            };
+        });
+        return inquirer.prompt([
+            {
+                message: "Select Exercise(s) to Delete:",
+                name: "exer",
+                choices: choices,
+                type: "checkbox"
+            }
+        ]).then( response => {
+            //*** DELETE FUNCTION GOES HERE ****
+            connection.end();
+        });
+    })
+};
