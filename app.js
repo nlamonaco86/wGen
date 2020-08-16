@@ -103,3 +103,16 @@ const editExer = () => {
         });
     })
 };
+
+
+function wGen() {
+    console.log("GENERATE A WORKOUT")
+    // get the user's name
+    // get their e-mail address
+    // give the user a choice of workout splits
+    // ask about desired volume level
+    // see what equipment they have available
+    // create a single week's workout based on that split and equipment
+    // print it to the console and/or e-mail it to them
+    connection.end();
+}
