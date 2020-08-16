@@ -97,6 +97,8 @@ const editExer = () => {
             }
         ]).then( response => {
             //*** DELETE FUNCTION GOES HERE ****
+            response.exer.forEach(exer => console.log(exer.exerID))
+            // console.log(response.exer[0].exerID)
             connection.end();
         });
     })
