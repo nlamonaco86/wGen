@@ -46,11 +46,6 @@ const mainMenu = () => {
         });
 }
 
-function wGen() {
-    console.log("GENERATE A WORKOUT")
-    connection.end();
-}
-
 //View the exercise database and print it to the console
 function exerDB() {
     connection.query("SELECT * FROM exercises", (err, results) => {
@@ -63,13 +58,13 @@ function exerDB() {
 }
 
 // uses choices from a list and dataRecord variable to greatly shorten the code
-const addExer = dataRecord => {
-    connection.query("INSERT INTO exercises SET ?", dataRecord, (err, results) => {
+const addExer = exerRecord => {
+    connection.query("INSERT INTO exercises SET ?", exerRecord, (err, results) => {
         if (err) throw err;
         mainMenu();
     })
 }
-// ask the create auction questions
+// ask the create exercise questions
 const addExerQ = () => {
     return inquirer.prompt(exerQ)
         .then(response => {
@@ -84,7 +79,7 @@ const editExer = () => {
         if(err) throw err;
         let choices = results.map( row => { 
             return {
-                name: `${row.exerID} / ${row.exercise} / ${row.main} / ${row.aux1} / ${row.aux2} / ${row.mgroup} / ${row.UorL} / ${row.equip}`,
+                name: `${row.exerID} | ${row.exercise} | ${row.main} | ${row.aux1} | ${row.aux2} | ${row.mgroup} | ${row.UorL} | ${row.equip}`,
                 value: row
             };
         });
@@ -92,14 +87,19 @@ const editExer = () => {
             {
                 message: "Select Exercise(s) to Delete:",
                 name: "exer",
-                choices: choices,
+                choices,
                 type: "checkbox"
             }
         ]).then( response => {
-            //*** DELETE FUNCTION GOES HERE ****
-            response.exer.forEach(exer => console.log(exer.exerID))
-            // console.log(response.exer[0].exerID)
-            connection.end();
+            // store targeted items in this empty array
+            const target = []
+            // push to the empty array
+            response.exer.forEach(exer => target.push(exer.exerID))
+            // delete the selected exercises * why does this only delete 1 even when multiple selected? *
+            connection.query("DELETE FROM exercises WHERE exerID = ?", target, (err, results) => {
+                if (err) throw err;
+            });
+            mainMenu();
         });
     })
 };
