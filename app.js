@@ -4,6 +4,7 @@ const inquirer = require("inquirer");
 const parts = require("./var")
 const equip = require("./var")
 const exerQ = require("./var")
+const genQ = require("./var")
 const connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
@@ -33,7 +34,7 @@ const mainMenu = () => {
             //switch case, because smoother than if/else
             switch (response.menuOpt) {
                 case "GENERATE A WORKOUT":
-                    return wGen();
+                    return wGenQ();
                 case "VIEW EXERCISE DATABASE":
                     return exerDB();
                 case "ADD TO EXERCISE DATABASE":
@@ -104,15 +105,33 @@ const editExer = () => {
     })
 };
 
-
-function wGen() {
-    console.log("GENERATE A WORKOUT")
-    // get the user's name
-    // get their e-mail address
-    // give the user a choice of workout splits
-    // ask about desired volume level
-    // see what equipment they have available
-    // create a single week's workout based on that split and equipment
-    // print it to the console and/or e-mail it to them
-    connection.end();
+const wGenQ = () => {
+    return inquirer.prompt(genQ)
+        .then(response => {
+            wGen(response)
+        });
 }
+
+const wGen = genRec => {
+    // console.log(genRec)
+    switch (genRec.split) {
+        case "Arnold":
+            return console.log("arnie");
+        case "Push / Pull / Legs":
+            return console.log("ppl");
+        case "Bro-Split":
+            return console.log("bro bro bro");
+        default:
+            mainMenu();
+    }
+}
+
+// Need 3 functions, one for each split
+// OR do we need 1 good function that can do all three (probably this...it's usually this)
+//     // get the user's name
+//     // get their e-mail address
+//     // give the user a choice of workout splits
+//     // ask about desired volume level
+//     // see what equipment they have available
+//     // create a single week's workout based on that split and equipment
+//     // print it to the console and/or e-mail it to them
