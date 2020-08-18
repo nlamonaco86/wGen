@@ -53,7 +53,7 @@ function exerDB() {
         results.forEach(row => {
             console.log(`${row.exerID} / ${row.exercise} / ${row.main} / ${row.aux1} / ${row.aux2} / ${row.mgroup} / ${row.UorL} / ${row.equip}`);
         });
-        connection.end();
+        mainMenu();
     })
 }
 

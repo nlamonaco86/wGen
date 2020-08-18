@@ -65,7 +65,7 @@ const genQ = [{
 },
 {
     type: "checkbox",
-    message: "Select the Equipment You Have Acces To:",
+    message: "Select the Equipment You Have Access To:",
     choices: equipment,
     name: "access",
 }]
