@@ -70,7 +70,4 @@ const genQ = [{
     name: "access",
 }]
 
-module.exports = parts
-module.exports = equipment
-module.exports = exerQ
-module.exports = genQ
+module.exports = {parts, equipment, split, genQ, exerQ}

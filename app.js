@@ -1,10 +1,9 @@
 // Dependencies
 const mysql = require("mysql");
 const inquirer = require("inquirer");
-const parts = require("./var")
-const equip = require("./var")
-const exerQ = require("./var")
-const genQ = require("./var")
+//object deconstruction
+const {parts, equipment, split, genQ, exerQ} = require("./var")
+
 const connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
@@ -69,7 +68,7 @@ const addExer = exerRecord => {
 const addExerQ = () => {
     return inquirer.prompt(exerQ)
         .then(response => {
-            addExer(response)
+            addExer(response);
         });
 }
 
@@ -96,8 +95,9 @@ const editExer = () => {
             const target = []
             // push to the empty array
             response.exer.forEach(exer => target.push(exer.exerID))
+            // console.log(target)
             // delete the selected exercises * why does this only delete 1 even when multiple selected? *
-            connection.query("DELETE FROM exercises WHERE exerID = ?", target, (err, results) => {
+            connection.query("DELETE FROM exercises WHERE exerID IN (?)", [target], (err, results) => {
                 if (err) throw err;
             });
             mainMenu();
@@ -116,7 +116,7 @@ const wGen = genRec => {
     // console.log(genRec)
     switch (genRec.split) {
         case "Arnold":
-            return console.log("arnie");
+            return console.log(genRec);
         case "Push / Pull / Legs":
             return console.log("ppl");
         case "Bro-Split":
