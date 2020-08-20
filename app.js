@@ -2,7 +2,7 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
 //object deconstruction
-const {parts, equipment, split, genQ, exerQ} = require("./var")
+const { parts, equipment, split, genQ, exerQ } = require("./var")
 
 const connection = mysql.createConnection({
     host: "localhost",
@@ -74,10 +74,10 @@ const addExerQ = () => {
 
 //function to remove exercises from the database
 const editExer = () => {
-//selects the exercises and prints to console as a list of choices in an Inquirer checkbox   
+    //selects the exercises and prints to console as a list of choices in an Inquirer checkbox   
     connection.query("SELECT * FROM exercises", (err, results) => {
-        if(err) throw err;
-        let choices = results.map( row => { 
+        if (err) throw err;
+        let choices = results.map(row => {
             return {
                 name: `${row.exerID} | ${row.exercise} | ${row.main} | ${row.aux1} | ${row.aux2} | ${row.mgroup} | ${row.UorL} | ${row.equip}`,
                 value: row
@@ -90,7 +90,7 @@ const editExer = () => {
                 choices,
                 type: "checkbox"
             }
-        ]).then( response => {
+        ]).then(response => {
             // store targeted items in this empty array
             const target = []
             // push to the empty array
@@ -116,7 +116,7 @@ const wGen = genRec => {
     // console.log(genRec)
     switch (genRec.split) {
         case "Arnold":
-            return console.log(genRec);
+            return genArnold(genRec);
         case "Push / Pull / Legs":
             return console.log("ppl");
         case "Bro-Split":
@@ -128,10 +128,14 @@ const wGen = genRec => {
 
 // Need 3 functions, one for each split
 // OR do we need 1 good function that can do all three (probably this...it's usually this)
-//     // get the user's name
-//     // get their e-mail address
-//     // give the user a choice of workout splits
-//     // ask about desired volume level
-//     // see what equipment they have available
-//     // create a single week's workout based on that split and equipment
-//     // print it to the console and/or e-mail it to them
+const genArnold = genRec => {
+    console.log(genRec)
+    mainMenu();
+}
+    // get the user's name
+    // get their e-mail address
+    // give the user a choice of workout splits
+    // ask about desired volume level
+    // see what equipment they have available
+    // create a single week's workout based on that split and equipment
+    // print it to the console and/or e-mail it to them
