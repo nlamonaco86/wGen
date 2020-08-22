@@ -5,8 +5,8 @@ Simple command line exercise database and workout generator
 
 First version, minimum viable product
 
-Add or View exercises from the database
-
-Next step: Ability to remove exercises from database
+Add, View, or Remove exercises from the database
 
 Next step: Select from workout splits and generate workouts from the database, based on personalized choices
+
+Next: Get and display this info through a UI rather than CLI
